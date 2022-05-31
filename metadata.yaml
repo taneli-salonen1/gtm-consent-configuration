@@ -1,0 +1,5 @@
+homepage: "https://tanelytics.com/"
+documentation: ""
+versions:
+  - sha: 69ae56de8abb14bb386d87610768cf47d59648c9
+    changeNotes: Added option to return individual consent statuses in consent mode format, granted or denied.
