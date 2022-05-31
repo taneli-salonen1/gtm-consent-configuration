@@ -1,5 +1,5 @@
 homepage: "https://tanelytics.com/"
-documentation: ""
+documentation: "https://github.com/taneli-salonen1/gtm-consent-configuration"
 versions:
-  - sha: 69ae56de8abb14bb386d87610768cf47d59648c9
-    changeNotes: Added option to return individual consent statuses in consent mode format, granted or denied.
+  - sha: 6154ba521db608354a31d1815187b542f4a74be4
+    changeNotes: First version.
