@@ -1,5 +1,7 @@
 homepage: "https://tanelytics.com/"
 documentation: "https://github.com/taneli-salonen1/gtm-consent-configuration"
 versions:
+  - sha: f1ee959b8ecf70a26f70dcf8796f7bb3fb3cd0de
+    changeNotes: Add container_id parameter to consent listener DL push.
   - sha: 6154ba521db608354a31d1815187b542f4a74be4
     changeNotes: First version.
