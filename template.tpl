@@ -18,8 +18,8 @@ ___INFO___
     "UTILITY"
   ],
   "brand": {
-    "id": "brand_dummy",
-    "displayName": ""
+    "id": "github.com_taneli-salonen1",
+    "displayName": "taneli-salonen1"
   },
   "description": "Set the consent types for GTM to be used with the tags\u0027 consent checks. Adds a consent change listener for consent types that are granted later. This can be used as a consent granted trigger.",
   "containerContexts": [
@@ -128,6 +128,7 @@ const updateConsentState = require('updateConsentState');
 const log = require('logToConsole');
 const dataLayerPush = require('createQueue')('dataLayer');
 const Object = require('Object');
+const getContainerVersion = require('getContainerVersion');
 
 const setConsentState = (input) => {
   if (input === 'granted' || input === true || input === 'true') {
@@ -142,10 +143,17 @@ const addConsentUpdateDl = (consentType) => {
     // only send the dataLayer push once
     if (wasCalled) return;
     if (granted) {
+      const eventName = consentType + '_granted';
+      const cv = getContainerVersion();
+      
+      const dlEvent = {
+        event: consentType + '_granted',
+        container_id: cv.containerId // container_id can be used for event deduplication in case multiple containers are installed on the same page
+      };
+
       // send a consent granted event that can be used as a trigger
-      dataLayerPush({
-        event: consentType + '_granted'
-      });
+      dataLayerPush(dlEvent);
+      
       wasCalled = true;
     }
   });
@@ -469,6 +477,16 @@ ___WEB_PERMISSIONS___
           }
         }
       ]
+    },
+    "isRequired": true
+  },
+  {
+    "instance": {
+      "key": {
+        "publicId": "read_container_data",
+        "versionId": "1"
+      },
+      "param": []
     },
     "isRequired": true
   }
