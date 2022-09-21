@@ -168,8 +168,6 @@ const consentSettings = {
   wait_for_update: data.configurationType === 'default' ? 500 : undefined
 };
 
-log(consentSettings);
-
 if (data.configurationType === 'default') {
   setDefaultConsentState(consentSettings);
 
