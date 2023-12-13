@@ -72,6 +72,11 @@ ___TEMPLATE_PARAMETERS___
     "help": "The tag can be used to either set the default (initial) consent types or to update previously set consent types."
   },
   {
+    "type": "LABEL",
+    "name": "standard parameters",
+    "displayName": "Standard consent parameters"
+  },
+  {
     "type": "TEXT",
     "name": "analytics_storage",
     "displayName": "analytics_storage",
@@ -113,6 +118,27 @@ ___TEMPLATE_PARAMETERS___
   },
   {
     "type": "LABEL",
+    "name": "v2 parameters",
+    "displayName": "Consent Mode V2 parameters"
+  },
+  {
+    "type": "TEXT",
+    "name": "ad_user_data",
+    "displayName": "ad_user_data",
+    "simpleValueType": true,
+    "alwaysInSummary": true,
+    "defaultValue": "(not set)"
+  },
+  {
+    "type": "TEXT",
+    "name": "ad_personalization",
+    "displayName": "ad_personalization",
+    "simpleValueType": true,
+    "alwaysInSummary": true,
+    "defaultValue": "(not set)"
+  },
+  {
+    "type": "LABEL",
     "name": "label1",
     "displayName": "For documentation on Tag Manager Consent Types see: https://support.google.com/tagmanager/answer/10718549?hl\u003den"
   }
@@ -129,8 +155,14 @@ const log = require('logToConsole');
 const dataLayerPush = require('createQueue')('dataLayer');
 const Object = require('Object');
 const getContainerVersion = require('getContainerVersion');
+const getType = require('getType');
 
 const setConsentState = (input) => {
+  if (input === '(not set)' || getType(input) === 'undefined') {
+    // allow introducing new consent parameters through template updates without auto setting the parameters to denied
+    return;
+  }
+  
   if (input === 'granted' || input === true || input === 'true') {
     return 'granted';
   }
@@ -165,6 +197,8 @@ const consentSettings = {
   personalization_storage: setConsentState(data.personalization_storage),
   ad_storage: setConsentState(data.ad_storage),
   security_storage: setConsentState(data.security_storage),
+  ad_user_data: setConsentState(data.ad_user_data),
+  ad_personalization: setConsentState(data.ad_personalization),
   wait_for_update: data.configurationType === 'default' ? 500 : undefined
 };
 
@@ -378,6 +412,68 @@ ___WEB_PERMISSIONS___
                   {
                     "type": 1,
                     "string": "wait_for_update"
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  }
+                ]
+              },
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "consentType"
+                  },
+                  {
+                    "type": 1,
+                    "string": "read"
+                  },
+                  {
+                    "type": 1,
+                    "string": "write"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "ad_user_data"
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  }
+                ]
+              },
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "consentType"
+                  },
+                  {
+                    "type": 1,
+                    "string": "read"
+                  },
+                  {
+                    "type": 1,
+                    "string": "write"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "ad_personalization"
                   },
                   {
                     "type": 8,
