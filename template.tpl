@@ -1,12 +1,4 @@
-﻿___TERMS_OF_SERVICE___
-
-By creating or modifying this file you agree to Google Tag Manager's Community
-Template Gallery Developer Terms of Service available at
-https://developers.google.com/tag-manager/gallery-tos (or such other URL as
-Google may provide), as modified from time to time.
-
-
-___INFO___
+﻿___INFO___
 
 {
   "type": "TAG",
@@ -65,14 +57,14 @@ ___TEMPLATE_PARAMETERS___
             "name": "region",
             "displayName": "Region (optional)",
             "simpleValueType": true,
-            "help": "An optional array or comma separated list of region codes specifying which region the consent settings apply to. Region codes are expressed using country and/or subdivisions in ISO 3166-2 format. Leave the field empty to apply to all regions."
+            "help": "A comma separated list or a JS array of ISO 3166-2 region codes that specify to which regions the consent applies to. \u003cstrong\u003eLeave empty to apply to all regions.\u003c/strong\u003e"
           },
           {
             "type": "TEXT",
             "name": "waitForUpdate",
             "displayName": "Wait for update (optional)",
             "simpleValueType": true,
-            "help": "Specifies a millisecond value to control how long to wait before data is sent. Used with consent tools that load asynchronously. Defaults to 500 milliseconds.",
+            "help": "Number of \u003cstrong\u003emilliseconds\u003c/strong\u003e to wait for a possible consent update. Applies to Google tags. Defaults to 500 milliseconds.",
             "valueValidators": [
               {
                 "type": "POSITIVE_NUMBER"
