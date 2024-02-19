@@ -13,7 +13,7 @@
     "id": "github.com_taneli-salonen1",
     "displayName": "taneli-salonen1"
   },
-  "description": "Set up consent mode in GTM to be used with the tags\u0027 consent checks. Can add a consent change listener for consent types that are granted later. This can be used as a consent granted trigger.",
+  "description": "Set up consent in GTM to be used with the tags\u0027 consent additional checks or for Google Consent Mode. Can also include dataLayer events for detecting when consent has been granted.",
   "containerContexts": [
     "WEB"
   ]
