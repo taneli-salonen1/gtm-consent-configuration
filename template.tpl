@@ -13,7 +13,7 @@ ___INFO___
   "id": "cvt_temp_public_id",
   "version": 1,
   "securityGroups": [],
-  "displayName": "GTM Consent Configuration",
+  "displayName": "GTM Consent Configuration (Consent Mode)",
   "categories": [
     "UTILITY"
   ],
@@ -21,7 +21,7 @@ ___INFO___
     "id": "github.com_taneli-salonen1",
     "displayName": "taneli-salonen1"
   },
-  "description": "Set the consent types for GTM to be used with the tags\u0027 consent checks. Adds a consent change listener for consent types that are granted later. This can be used as a consent granted trigger.",
+  "description": "Set up consent mode in GTM to be used with the tags\u0027 consent checks. Can add a consent change listener for consent types that are granted later. This can be used as a consent granted trigger.",
   "containerContexts": [
     "WEB"
   ]
@@ -59,6 +59,30 @@ ___TEMPLATE_PARAMETERS___
             "simpleValueType": true,
             "help": "",
             "defaultValue": "yes"
+          },
+          {
+            "type": "TEXT",
+            "name": "region",
+            "displayName": "Region (optional)",
+            "simpleValueType": true,
+            "help": "An optional array or comma separated list of region codes specifying which region the consent settings apply to. Region codes are expressed using country and/or subdivisions in ISO 3166-2 format. Leave the field empty to apply to all regions."
+          },
+          {
+            "type": "TEXT",
+            "name": "waitForUpdate",
+            "displayName": "Wait for update (optional)",
+            "simpleValueType": true,
+            "help": "Specifies a millisecond value to control how long to wait before data is sent. Used with consent tools that load asynchronously. Defaults to 500 milliseconds.",
+            "valueValidators": [
+              {
+                "type": "POSITIVE_NUMBER"
+              }
+            ]
+          },
+          {
+            "type": "LABEL",
+            "name": "defaultConsentStateInfo",
+            "displayName": "https://developers.google.com/tag-platform/tag-manager/templates/api#setdefaultconsentstate"
           }
         ]
       },
@@ -156,6 +180,7 @@ const dataLayerPush = require('createQueue')('dataLayer');
 const Object = require('Object');
 const getContainerVersion = require('getContainerVersion');
 const getType = require('getType');
+const makeNumber = require('makeNumber');
 
 const setConsentState = (input) => {
   if (input === '(not set)' || getType(input) === 'undefined') {
@@ -191,6 +216,22 @@ const addConsentUpdateDl = (consentType) => {
   });
 };
 
+// convert a string input value into JS array
+const createList = (input) => {
+  if (input) {
+    if (getType(input) === 'string') {
+      return input.split(',').map(item => item.trim());
+    }
+    if (getType(input) === 'array') {
+      return input;
+    }
+  }
+  
+  return;
+};
+
+const waitForUpdate = makeNumber(data.waitForUpdate) > 0 ? makeNumber(data.waitForUpdate) : 500;
+
 const consentSettings = {
   analytics_storage: setConsentState(data.analytics_storage),
   functionality_storage: setConsentState(data.functionality_storage),
@@ -199,7 +240,8 @@ const consentSettings = {
   security_storage: setConsentState(data.security_storage),
   ad_user_data: setConsentState(data.ad_user_data),
   ad_personalization: setConsentState(data.ad_personalization),
-  wait_for_update: data.configurationType === 'default' ? 500 : undefined
+  region: data.configurationType === 'default' ? createList(data.region) : undefined,
+  wait_for_update: data.configurationType === 'default' ? waitForUpdate : undefined
 };
 
 if (data.configurationType === 'default') {
@@ -484,6 +526,37 @@ ___WEB_PERMISSIONS___
                     "boolean": true
                   }
                 ]
+              },
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "consentType"
+                  },
+                  {
+                    "type": 1,
+                    "string": "read"
+                  },
+                  {
+                    "type": 1,
+                    "string": "write"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "region"
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  }
+                ]
               }
             ]
           }
@@ -599,7 +672,8 @@ scenarios:
       ad_storage: 'denied',
       security_storage: 'denied',
       configurationType: 'default',
-      consentUpdateListener: 'no'
+      consentUpdateListener: 'no',
+      region: ['FI']
     };
 
     // Call runCode to run the template's code.
