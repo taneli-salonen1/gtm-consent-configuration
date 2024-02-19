@@ -1,4 +1,12 @@
-﻿___INFO___
+﻿___TERMS_OF_SERVICE___
+
+By creating or modifying this file you agree to Google Tag Manager's Community
+Template Gallery Developer Terms of Service available at
+https://developers.google.com/tag-manager/gallery-tos (or such other URL as
+Google may provide), as modified from time to time.
+
+
+___INFO___
 
 {
   "type": "TAG",
@@ -70,7 +78,12 @@ ___TEMPLATE_PARAMETERS___
                 "name": "waitForUpdate",
                 "displayName": "Wait for update (optional)",
                 "simpleValueType": true,
-                "help": "Number of \u003cstrong\u003emilliseconds\u003c/strong\u003e to wait for a possible consent update. \u003c/br\u003e\u003c/br\u003e \u003cstrong\u003eOnly applies to Google tags.\u003c/strong\u003e \u003c/br\u003e\u003c/br\u003e Defaults to 500 milliseconds."
+                "help": "Number of \u003cstrong\u003emilliseconds\u003c/strong\u003e to wait for a possible consent update. \u003c/br\u003e\u003c/br\u003e \u003cstrong\u003eOnly applies to Google tags.\u003c/strong\u003e \u003c/br\u003e\u003c/br\u003e Defaults to 500 milliseconds.",
+                "valueValidators": [
+                  {
+                    "type": "POSITIVE_NUMBER"
+                  }
+                ]
               }
             ]
           }
