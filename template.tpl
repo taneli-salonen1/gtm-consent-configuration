@@ -31,7 +31,7 @@ ___TEMPLATE_PARAMETERS___
       {
         "value": "default",
         "displayValue": "default",
-        "help": "Used when setting the initial consent status.",
+        "help": "Used when setting the \u003cstrong\u003einitial consent status\u003c/strong\u003e.",
         "subParams": [
           {
             "type": "RADIO",
@@ -41,7 +41,7 @@ ___TEMPLATE_PARAMETERS___
               {
                 "value": "yes",
                 "displayValue": "Yes",
-                "help": "Will push consent granted events to the dataLayer when consent types that weren\u0027t granted previously have been granted."
+                "help": "Includes a consent update listener to those consent types that were set to \u003cstrong\u003edenied\u003c/strong\u003e. A dataLayer event will be pushed when a consent type becomes \u003cstrong\u003egranted\u003c/strong\u003e.\n\u003c/br\u003e\u003c/br\u003e\nBeware of side effects, such as duplicate dataLayer events, if multiple tags are set to include consent update listeners simultaneously."
               },
               {
                 "value": "no",
@@ -53,35 +53,33 @@ ___TEMPLATE_PARAMETERS___
             "defaultValue": "yes"
           },
           {
-            "type": "TEXT",
-            "name": "region",
-            "displayName": "Region (optional)",
-            "simpleValueType": true,
-            "help": "A comma separated list or a JS array of ISO 3166-2 region codes that specify to which regions the consent applies to. \u003cstrong\u003eLeave empty to apply to all regions.\u003c/strong\u003e"
-          },
-          {
-            "type": "TEXT",
-            "name": "waitForUpdate",
-            "displayName": "Wait for update (optional)",
-            "simpleValueType": true,
-            "help": "Number of \u003cstrong\u003emilliseconds\u003c/strong\u003e to wait for a possible consent update. Applies to Google tags. Defaults to 500 milliseconds.",
-            "valueValidators": [
+            "type": "GROUP",
+            "name": "additionalSettings",
+            "displayName": "Additional settings",
+            "groupStyle": "ZIPPY_CLOSED",
+            "subParams": [
               {
-                "type": "POSITIVE_NUMBER"
+                "type": "TEXT",
+                "name": "region",
+                "displayName": "Region (optional)",
+                "simpleValueType": true,
+                "help": "A comma separated list or a JS array of ISO 3166-2 region codes that specify to which regions the consent applies to. \u003c/br\u003e\u003c/br\u003e \u003cstrong\u003eLeave empty to apply to all regions.\u003c/strong\u003e \u003c/br\u003e\u003c/br\u003e Note that the region setting only applies to \"default\" consent."
+              },
+              {
+                "type": "TEXT",
+                "name": "waitForUpdate",
+                "displayName": "Wait for update (optional)",
+                "simpleValueType": true,
+                "help": "Number of \u003cstrong\u003emilliseconds\u003c/strong\u003e to wait for a possible consent update. \u003c/br\u003e\u003c/br\u003e \u003cstrong\u003eOnly applies to Google tags.\u003c/strong\u003e \u003c/br\u003e\u003c/br\u003e Defaults to 500 milliseconds."
               }
             ]
-          },
-          {
-            "type": "LABEL",
-            "name": "defaultConsentStateInfo",
-            "displayName": "https://developers.google.com/tag-platform/tag-manager/templates/api#setdefaultconsentstate"
           }
         ]
       },
       {
         "value": "update",
         "displayValue": "update",
-        "help": "Used when the consent preferences are updated."
+        "help": "Used when the previously set consent preferences are \u003cstrong\u003eupdated\u003c/strong\u003e."
       }
     ],
     "simpleValueType": true,
@@ -211,7 +209,7 @@ const addConsentUpdateDl = (consentType) => {
 // convert a string input value into JS array
 const createList = (input) => {
   if (input) {
-    if (getType(input) === 'string') {
+    if (getType(input) === 'string' && input.length > 0) {
       return input.split(',').map(item => item.trim());
     }
     if (getType(input) === 'array') {
@@ -636,6 +634,9 @@ ___WEB_PERMISSIONS___
           }
         }
       ]
+    },
+    "clientAnnotations": {
+      "isEditedByUser": true
     },
     "isRequired": true
   },
