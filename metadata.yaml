@@ -1,6 +1,8 @@
 homepage: "https://tanelytics.com/"
 documentation: "https://github.com/taneli-salonen1/gtm-consent-configuration"
 versions:
+  - sha: ddc566d21e903de685d9224cc0a4621c534cea5e
+    changeNotes: Allow setting wait_for_update to 0 in the default consent config.
   - sha: 10c7bff82855783e03b219d2277a32b5d2228227
     changeNotes: Add support for setting regions and adjusting wait_for_update.
   - sha: 64153b59f1965d6b6dd930ea4e0a66db990a9c7d
