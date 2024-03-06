@@ -81,7 +81,7 @@ ___TEMPLATE_PARAMETERS___
                 "help": "Number of \u003cstrong\u003emilliseconds\u003c/strong\u003e to wait for a possible consent update. \u003c/br\u003e\u003c/br\u003e \u003cstrong\u003eOnly applies to Google tags.\u003c/strong\u003e \u003c/br\u003e\u003c/br\u003e Defaults to 500 milliseconds.",
                 "valueValidators": [
                   {
-                    "type": "POSITIVE_NUMBER"
+                    "type": "NON_NEGATIVE_NUMBER"
                   }
                 ]
               }
@@ -233,7 +233,7 @@ const createList = (input) => {
   return;
 };
 
-const waitForUpdate = makeNumber(data.waitForUpdate) > 0 ? makeNumber(data.waitForUpdate) : 500;
+const waitForUpdate = makeNumber(data.waitForUpdate) >= 0 ? makeNumber(data.waitForUpdate) : 500;
 
 const consentSettings = {
   analytics_storage: setConsentState(data.analytics_storage),
