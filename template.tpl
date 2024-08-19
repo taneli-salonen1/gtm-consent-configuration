@@ -38,7 +38,7 @@ ___TEMPLATE_PARAMETERS___
     "radioItems": [
       {
         "value": "default",
-        "displayValue": "default",
+        "displayValue": "Default",
         "help": "Used when setting the \u003cstrong\u003einitial consent status\u003c/strong\u003e.",
         "subParams": [
           {
@@ -91,8 +91,64 @@ ___TEMPLATE_PARAMETERS___
       },
       {
         "value": "update",
-        "displayValue": "update",
+        "displayValue": "Update",
         "help": "Used when the previously set consent preferences are \u003cstrong\u003eupdated\u003c/strong\u003e."
+      },
+      {
+        "value": "listener",
+        "displayValue": "Consent update listener only (DataLayer)",
+        "help": "\u003cstrong\u003eOnly set up dataLayer consent update events.\u003c/strong\u003e\n\u003c/br\u003e\u003c/br\u003e\nThis option doesn\u0027t modify the consent mode consent types in GTM. It only creates consent update listeners that listen for changes in the visitor\u0027s preferences.\n\u003c/br\u003e\u003c/br\u003e\nThis can be useful if the CMP vendor\u0027s template or script is itself in charge of setting and managing the consents but doesn\u0027t provide proper dataLayer events for detecting the changes in the visitor\u0027s preferences.\n\u003c/br\u003e\u003c/br\u003e\nThe option generates a dataLayer event for each of the included consent types. The event fires when the consent type becomes granted.\n\u003c/br\u003e\u003c/br\u003e\nExample event: \u003cstrong\u003eanalytics_storage_granted\u003c/strong\u003e",
+        "subParams": [
+          {
+            "type": "CHECKBOX",
+            "name": "analytics_storage_listener",
+            "checkboxText": "analytics_storage",
+            "simpleValueType": true,
+            "defaultValue": true
+          },
+          {
+            "type": "CHECKBOX",
+            "name": "functionality_storage_listener",
+            "checkboxText": "functionality_storage",
+            "simpleValueType": true,
+            "defaultValue": true
+          },
+          {
+            "type": "CHECKBOX",
+            "name": "personalization_storage_listener",
+            "checkboxText": "personalization_storage",
+            "simpleValueType": true,
+            "defaultValue": true
+          },
+          {
+            "type": "CHECKBOX",
+            "name": "ad_storage_listener",
+            "checkboxText": "ad_storage",
+            "simpleValueType": true,
+            "defaultValue": true
+          },
+          {
+            "type": "CHECKBOX",
+            "name": "security_storage_listener",
+            "checkboxText": "security_storage",
+            "simpleValueType": true,
+            "defaultValue": true
+          },
+          {
+            "type": "CHECKBOX",
+            "name": "ad_user_data_listener",
+            "checkboxText": "ad_user_data",
+            "simpleValueType": true,
+            "defaultValue": true
+          },
+          {
+            "type": "CHECKBOX",
+            "name": "ad_personalization_listener",
+            "checkboxText": "ad_personalization",
+            "simpleValueType": true,
+            "defaultValue": true
+          }
+        ]
       }
     ],
     "simpleValueType": true,
@@ -101,7 +157,14 @@ ___TEMPLATE_PARAMETERS___
   {
     "type": "LABEL",
     "name": "standard parameters",
-    "displayName": "Standard consent parameters"
+    "displayName": "Standard consent parameters",
+    "enablingConditions": [
+      {
+        "paramName": "configurationType",
+        "paramValue": "listener",
+        "type": "NOT_EQUALS"
+      }
+    ]
   },
   {
     "type": "TEXT",
@@ -109,7 +172,14 @@ ___TEMPLATE_PARAMETERS___
     "displayName": "analytics_storage",
     "simpleValueType": true,
     "alwaysInSummary": true,
-    "defaultValue": "denied"
+    "defaultValue": "denied",
+    "enablingConditions": [
+      {
+        "paramName": "configurationType",
+        "paramValue": "listener",
+        "type": "NOT_EQUALS"
+      }
+    ]
   },
   {
     "type": "TEXT",
@@ -117,7 +187,14 @@ ___TEMPLATE_PARAMETERS___
     "displayName": "functionality_storage",
     "simpleValueType": true,
     "alwaysInSummary": true,
-    "defaultValue": "denied"
+    "defaultValue": "denied",
+    "enablingConditions": [
+      {
+        "paramName": "configurationType",
+        "paramValue": "listener",
+        "type": "NOT_EQUALS"
+      }
+    ]
   },
   {
     "type": "TEXT",
@@ -125,7 +202,14 @@ ___TEMPLATE_PARAMETERS___
     "displayName": "personalization_storage",
     "simpleValueType": true,
     "alwaysInSummary": true,
-    "defaultValue": "denied"
+    "defaultValue": "denied",
+    "enablingConditions": [
+      {
+        "paramName": "configurationType",
+        "paramValue": "listener",
+        "type": "NOT_EQUALS"
+      }
+    ]
   },
   {
     "type": "TEXT",
@@ -133,7 +217,14 @@ ___TEMPLATE_PARAMETERS___
     "displayName": "ad_storage",
     "simpleValueType": true,
     "alwaysInSummary": true,
-    "defaultValue": "denied"
+    "defaultValue": "denied",
+    "enablingConditions": [
+      {
+        "paramName": "configurationType",
+        "paramValue": "listener",
+        "type": "NOT_EQUALS"
+      }
+    ]
   },
   {
     "type": "TEXT",
@@ -141,12 +232,26 @@ ___TEMPLATE_PARAMETERS___
     "displayName": "security_storage",
     "simpleValueType": true,
     "alwaysInSummary": true,
-    "defaultValue": "denied"
+    "defaultValue": "denied",
+    "enablingConditions": [
+      {
+        "paramName": "configurationType",
+        "paramValue": "listener",
+        "type": "NOT_EQUALS"
+      }
+    ]
   },
   {
     "type": "LABEL",
     "name": "v2 parameters",
-    "displayName": "Consent Mode V2 parameters"
+    "displayName": "Consent Mode V2 parameters",
+    "enablingConditions": [
+      {
+        "paramName": "configurationType",
+        "paramValue": "listener",
+        "type": "NOT_EQUALS"
+      }
+    ]
   },
   {
     "type": "TEXT",
@@ -154,7 +259,14 @@ ___TEMPLATE_PARAMETERS___
     "displayName": "ad_user_data",
     "simpleValueType": true,
     "alwaysInSummary": true,
-    "defaultValue": "(not set)"
+    "defaultValue": "(not set)",
+    "enablingConditions": [
+      {
+        "paramName": "configurationType",
+        "paramValue": "listener",
+        "type": "NOT_EQUALS"
+      }
+    ]
   },
   {
     "type": "TEXT",
@@ -162,7 +274,14 @@ ___TEMPLATE_PARAMETERS___
     "displayName": "ad_personalization",
     "simpleValueType": true,
     "alwaysInSummary": true,
-    "defaultValue": "(not set)"
+    "defaultValue": "(not set)",
+    "enablingConditions": [
+      {
+        "paramName": "configurationType",
+        "paramValue": "listener",
+        "type": "NOT_EQUALS"
+      }
+    ]
   },
   {
     "type": "LABEL",
@@ -262,6 +381,24 @@ if (data.configurationType === 'default') {
 
 if (data.configurationType === 'update') {
   updateConsentState(consentSettings);
+}
+
+if (data.configurationType === 'listener') {
+  const includedListeners = [
+    'analytics_storage',
+    'functionality_storage',
+    'personalization_storage',
+    'ad_storage',
+    'security_storage',
+    'ad_user_data',
+    'ad_personalization'
+  ].filter(consentType => {
+    return data[consentType + '_listener'] === true;
+  });
+  
+  includedListeners.forEach(consentType => {
+    addConsentUpdateDl(consentType);
+  });
 }
 
 data.gtmOnSuccess();
