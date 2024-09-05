@@ -40,7 +40,7 @@ With option 2, make sure to set the listeners immediately after the consent type
 
 ## Microsoft UET Consent Mode
 
-The tag now also supports Microsoft Consent Modes, which relies on a similar logic with the default consent and update consent commands. Microsoft Consent Mode can be enabled with one click in the tag settings.
+The tag now also supports Microsoft Consent Mode, which relies on a similar logic with the default consent and update consent commands. Microsoft Consent Mode can be enabled with one click in the tag settings.
 
 ![Enable Microsoft Consent Mode](uet_consent_mode.png)
 
