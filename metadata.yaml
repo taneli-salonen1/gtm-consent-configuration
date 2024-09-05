@@ -1,6 +1,8 @@
 homepage: "https://tanelytics.com/"
 documentation: "https://github.com/taneli-salonen1/gtm-consent-configuration"
 versions:
+  - sha: 3bc6b991b5aa6fd23eba28e8e9459bc7b409eb6d
+    changeNotes: Support for Microsoft UET Consent Mode.
   - sha: 0e81241cb59f213541b238fc1413123e3452c648
     changeNotes: Allow setting up consent listeners (dataLayer) separately without setting consent at the same time.
   - sha: ddc566d21e903de685d9224cc0a4621c534cea5e
