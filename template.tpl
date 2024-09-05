@@ -21,7 +21,7 @@ ___INFO___
     "id": "github.com_taneli-salonen1",
     "displayName": "taneli-salonen1"
   },
-  "description": "Set up consent in GTM to be used with the tags\u0027 consent additional checks or for Google Consent Mode. Can also include dataLayer events for detecting when consent has been granted.",
+  "description": "Set the consent types for GTM, Google Consent Mode, and Microsoft Consent Mode. The tag can also listen to changes in the consent states and push dataLayer events when consent types become granted.",
   "containerContexts": [
     "WEB"
   ]
@@ -156,8 +156,53 @@ ___TEMPLATE_PARAMETERS___
   },
   {
     "type": "LABEL",
-    "name": "standard parameters",
-    "displayName": "Standard consent parameters",
+    "name": "standardParams",
+    "displayName": "\u003cstrong\u003eGoogle Consent Mode parameters\u003c/strong\u003e",
+    "enablingConditions": [
+      {
+        "paramName": "configurationType",
+        "paramValue": "listener",
+        "type": "NOT_EQUALS"
+      }
+    ]
+  },
+  {
+    "type": "TEXT",
+    "name": "ad_storage",
+    "displayName": "ad_storage",
+    "simpleValueType": true,
+    "alwaysInSummary": true,
+    "defaultValue": "denied",
+    "enablingConditions": [
+      {
+        "paramName": "configurationType",
+        "paramValue": "listener",
+        "type": "NOT_EQUALS"
+      }
+    ]
+  },
+  {
+    "type": "TEXT",
+    "name": "ad_user_data",
+    "displayName": "ad_user_data",
+    "simpleValueType": true,
+    "alwaysInSummary": true,
+    "defaultValue": "(not set)",
+    "enablingConditions": [
+      {
+        "paramName": "configurationType",
+        "paramValue": "listener",
+        "type": "NOT_EQUALS"
+      }
+    ]
+  },
+  {
+    "type": "TEXT",
+    "name": "ad_personalization",
+    "displayName": "ad_personalization",
+    "simpleValueType": true,
+    "alwaysInSummary": true,
+    "defaultValue": "(not set)",
     "enablingConditions": [
       {
         "paramName": "configurationType",
@@ -173,6 +218,18 @@ ___TEMPLATE_PARAMETERS___
     "simpleValueType": true,
     "alwaysInSummary": true,
     "defaultValue": "denied",
+    "enablingConditions": [
+      {
+        "paramName": "configurationType",
+        "paramValue": "listener",
+        "type": "NOT_EQUALS"
+      }
+    ]
+  },
+  {
+    "type": "LABEL",
+    "name": "privacyParams",
+    "displayName": "\u003cstrong\u003eOther privacy parameters\u003c/strong\u003e",
     "enablingConditions": [
       {
         "paramName": "configurationType",
@@ -213,21 +270,6 @@ ___TEMPLATE_PARAMETERS___
   },
   {
     "type": "TEXT",
-    "name": "ad_storage",
-    "displayName": "ad_storage",
-    "simpleValueType": true,
-    "alwaysInSummary": true,
-    "defaultValue": "denied",
-    "enablingConditions": [
-      {
-        "paramName": "configurationType",
-        "paramValue": "listener",
-        "type": "NOT_EQUALS"
-      }
-    ]
-  },
-  {
-    "type": "TEXT",
     "name": "security_storage",
     "displayName": "security_storage",
     "simpleValueType": true,
@@ -242,51 +284,25 @@ ___TEMPLATE_PARAMETERS___
     ]
   },
   {
-    "type": "LABEL",
-    "name": "v2 parameters",
-    "displayName": "Consent Mode V2 parameters",
-    "enablingConditions": [
-      {
-        "paramName": "configurationType",
-        "paramValue": "listener",
-        "type": "NOT_EQUALS"
-      }
-    ]
-  },
-  {
-    "type": "TEXT",
-    "name": "ad_user_data",
-    "displayName": "ad_user_data",
+    "type": "CHECKBOX",
+    "name": "microsoftUET",
+    "checkboxText": "Enable Microsoft (UET) Consent Mode",
     "simpleValueType": true,
-    "alwaysInSummary": true,
-    "defaultValue": "(not set)",
     "enablingConditions": [
       {
         "paramName": "configurationType",
         "paramValue": "listener",
         "type": "NOT_EQUALS"
       }
-    ]
-  },
-  {
-    "type": "TEXT",
-    "name": "ad_personalization",
-    "displayName": "ad_personalization",
-    "simpleValueType": true,
-    "alwaysInSummary": true,
-    "defaultValue": "(not set)",
-    "enablingConditions": [
-      {
-        "paramName": "configurationType",
-        "paramValue": "listener",
-        "type": "NOT_EQUALS"
-      }
-    ]
+    ],
+    "help": "Sets the \u003cstrong\u003ead_storage\u003c/strong\u003e consent parameter for UET Consent Mode.",
+    "displayName": "Microsoft Consent Mode",
+    "defaultValue": false
   },
   {
     "type": "LABEL",
-    "name": "label1",
-    "displayName": "For documentation on Tag Manager Consent Types see: https://support.google.com/tagmanager/answer/10718549?hl\u003den"
+    "name": "documentation",
+    "displayName": "For documentation on Tag Manager Consent Types see: https://support.google.com/tagmanager/answer/10718549"
   }
 ]
 
@@ -303,8 +319,9 @@ const Object = require('Object');
 const getContainerVersion = require('getContainerVersion');
 const getType = require('getType');
 const makeNumber = require('makeNumber');
+const uetq = require('createQueue')('uetq');
 
-const setConsentState = (input) => {
+const getConsentStatus = (input) => {
   if (input === '(not set)' || getType(input) === 'undefined') {
     // allow introducing new consent parameters through template updates without auto setting the parameters to denied
     return;
@@ -316,10 +333,10 @@ const setConsentState = (input) => {
   return 'denied';
 };
 
+// attach a listener to the selected consent type
 const addConsentUpdateDl = (consentType) => {
   let wasCalled = false;
   addConsentListener(consentType, (consentType, granted) => {
-    // only send the dataLayer push once
     if (wasCalled) return;
     if (granted) {
       const eventName = consentType + '_granted';
@@ -355,32 +372,37 @@ const createList = (input) => {
 const waitForUpdate = makeNumber(data.waitForUpdate) >= 0 ? makeNumber(data.waitForUpdate) : 500;
 
 const consentSettings = {
-  analytics_storage: setConsentState(data.analytics_storage),
-  functionality_storage: setConsentState(data.functionality_storage),
-  personalization_storage: setConsentState(data.personalization_storage),
-  ad_storage: setConsentState(data.ad_storage),
-  security_storage: setConsentState(data.security_storage),
-  ad_user_data: setConsentState(data.ad_user_data),
-  ad_personalization: setConsentState(data.ad_personalization),
+  analytics_storage: getConsentStatus(data.analytics_storage),
+  functionality_storage: getConsentStatus(data.functionality_storage),
+  personalization_storage: getConsentStatus(data.personalization_storage),
+  ad_storage: getConsentStatus(data.ad_storage),
+  security_storage: getConsentStatus(data.security_storage),
+  ad_user_data: getConsentStatus(data.ad_user_data),
+  ad_personalization: getConsentStatus(data.ad_personalization),
   region: data.configurationType === 'default' ? createList(data.region) : undefined,
   wait_for_update: data.configurationType === 'default' ? waitForUpdate : undefined
 };
 
-if (data.configurationType === 'default') {
-  setDefaultConsentState(consentSettings);
+
+
+if (data.configurationType === 'default' || data.configurationType === 'update') {
+  const setConsentState = data.configurationType === 'default' ? setDefaultConsentState : updateConsentState;
+  
+  setConsentState(consentSettings);
+  
+  // Microsoft consent mode
+  if (data.microsoftUET) {
+    uetq('consent', data.configurationType, consentSettings);
+  }
 
   // add a consent change listener for each consent type that were denied
-  if (data.consentUpdateListener === 'yes') {
+  if (data.configurationType === 'default' && data.consentUpdateListener === 'yes') {
     for (let key of Object.keys(consentSettings)) {
       if (consentSettings[key] === 'denied') {
         addConsentUpdateDl(key);
       }
     }
   }
-}
-
-if (data.configurationType === 'update') {
-  updateConsentState(consentSettings);
 }
 
 if (data.configurationType === 'listener') {
@@ -744,6 +766,45 @@ ___WEB_PERMISSIONS___
                   {
                     "type": 1,
                     "string": "dataLayer"
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": false
+                  }
+                ]
+              },
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "key"
+                  },
+                  {
+                    "type": 1,
+                    "string": "read"
+                  },
+                  {
+                    "type": 1,
+                    "string": "write"
+                  },
+                  {
+                    "type": 1,
+                    "string": "execute"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "uetq"
                   },
                   {
                     "type": 8,
