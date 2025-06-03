@@ -1,6 +1,8 @@
 homepage: "https://tanelytics.com/"
 documentation: "https://github.com/taneli-salonen1/gtm-consent-configuration"
 versions:
+  - sha: 27c6a8e16a4c0ee7febcb1606215f2a257301610
+    changeNotes: Instead of setting ignored consent parameters as undefined, don't set them at all. Fixes issues related to how Google interprets undefined parameter values.
   - sha: 3bc6b991b5aa6fd23eba28e8e9459bc7b409eb6d
     changeNotes: Support for Microsoft UET Consent Mode.
   - sha: 0e81241cb59f213541b238fc1413123e3452c648
