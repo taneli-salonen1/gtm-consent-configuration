@@ -321,6 +321,31 @@ const getType = require('getType');
 const makeNumber = require('makeNumber');
 const uetq = require('createQueue')('uetq');
 
+// included consent types
+const consentTypes = [
+  'ad_storage',
+  'ad_user_data',
+  'ad_personalization',
+  'analytics_storage',
+  'functionality_storage',
+  'personalization_storage',
+  'security_storage'
+];
+
+// convert a string input value into JS array
+const createList = (input) => {
+  if (input) {
+    if (getType(input) === 'string' && input.length > 0) {
+      return input.split(',').map(item => item.trim());
+    }
+    if (getType(input) === 'array') {
+      return input;
+    }
+  }
+  
+  return;
+};
+
 const getConsentStatus = (input) => {
   if (input === '(not set)' || getType(input) === 'undefined') {
     // allow introducing new consent parameters through template updates without auto setting the parameters to denied
@@ -332,6 +357,29 @@ const getConsentStatus = (input) => {
   }
   return 'denied';
 };
+
+// build the consent object
+const getConsentObject = () => {
+  const consentObject = {};
+  
+  consentTypes.forEach(type => {
+    const status = getConsentStatus(data[type]);
+    if(getType(status) !== 'undefined') {
+      consentObject[type] = status;
+    }
+  });
+  
+  if (data.configurationType === 'default') {
+    const waitForUpdate = makeNumber(data.waitForUpdate) >= 0 ? makeNumber(data.waitForUpdate) : 500;
+    
+    consentObject.region = createList(data.region);
+    consentObject.wait_for_update = waitForUpdate;
+  }
+  
+  return consentObject;
+};
+
+const consentSettings = getConsentObject();
 
 // attach a listener to the selected consent type
 const addConsentUpdateDl = (consentType) => {
@@ -355,36 +403,6 @@ const addConsentUpdateDl = (consentType) => {
   });
 };
 
-// convert a string input value into JS array
-const createList = (input) => {
-  if (input) {
-    if (getType(input) === 'string' && input.length > 0) {
-      return input.split(',').map(item => item.trim());
-    }
-    if (getType(input) === 'array') {
-      return input;
-    }
-  }
-  
-  return;
-};
-
-const waitForUpdate = makeNumber(data.waitForUpdate) >= 0 ? makeNumber(data.waitForUpdate) : 500;
-
-const consentSettings = {
-  analytics_storage: getConsentStatus(data.analytics_storage),
-  functionality_storage: getConsentStatus(data.functionality_storage),
-  personalization_storage: getConsentStatus(data.personalization_storage),
-  ad_storage: getConsentStatus(data.ad_storage),
-  security_storage: getConsentStatus(data.security_storage),
-  ad_user_data: getConsentStatus(data.ad_user_data),
-  ad_personalization: getConsentStatus(data.ad_personalization),
-  region: data.configurationType === 'default' ? createList(data.region) : undefined,
-  wait_for_update: data.configurationType === 'default' ? waitForUpdate : undefined
-};
-
-
-
 if (data.configurationType === 'default' || data.configurationType === 'update') {
   const setConsentState = data.configurationType === 'default' ? setDefaultConsentState : updateConsentState;
   
@@ -406,15 +424,7 @@ if (data.configurationType === 'default' || data.configurationType === 'update')
 }
 
 if (data.configurationType === 'listener') {
-  const includedListeners = [
-    'analytics_storage',
-    'functionality_storage',
-    'personalization_storage',
-    'ad_storage',
-    'security_storage',
-    'ad_user_data',
-    'ad_personalization'
-  ].filter(consentType => {
+  const includedListeners = consentTypes.filter(consentType => {
     return data[consentType + '_listener'] === true;
   });
   
