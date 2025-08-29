@@ -12,7 +12,6 @@ ___INFO___
   "type": "TAG",
   "id": "cvt_temp_public_id",
   "version": 1,
-  "securityGroups": [],
   "displayName": "GTM Consent Configuration (Consent Mode)",
   "categories": [
     "UTILITY"
@@ -24,7 +23,8 @@ ___INFO___
   "description": "Set the consent types for GTM, Google Consent Mode, and Microsoft Consent Mode. The tag can also listen to changes in the consent states and push dataLayer events when consent types become granted.",
   "containerContexts": [
     "WEB"
-  ]
+  ],
+  "securityGroups": []
 }
 
 
@@ -286,7 +286,7 @@ ___TEMPLATE_PARAMETERS___
   {
     "type": "CHECKBOX",
     "name": "microsoftUET",
-    "checkboxText": "Enable Microsoft (UET) Consent Mode",
+    "checkboxText": "Enable Microsoft (UET and Clarity) Consent",
     "simpleValueType": true,
     "enablingConditions": [
       {
@@ -295,7 +295,7 @@ ___TEMPLATE_PARAMETERS___
         "type": "NOT_EQUALS"
       }
     ],
-    "help": "Sets the \u003cstrong\u003ead_storage\u003c/strong\u003e consent parameter for UET Consent Mode.",
+    "help": "Sets the consent parameters for Microsoft UET Consent Mode and Clarity Consent Mode (v2 API).\n\u003c/br\u003e\u003c/br\u003e\nNote that Clarity may also access the Google Consent Mode signals. See: https://learn.microsoft.com/en-us/clarity/setup-and-installation/cookie-gcm",
     "displayName": "Microsoft Consent Mode",
     "defaultValue": false
   },
@@ -319,7 +319,9 @@ const Object = require('Object');
 const getContainerVersion = require('getContainerVersion');
 const getType = require('getType');
 const makeNumber = require('makeNumber');
-const uetq = require('createQueue')('uetq');
+const copyFromWindow = require('copyFromWindow');
+const setInWindow = require('setInWindow');
+const createQueue = require('createQueue');
 
 // included consent types
 const consentTypes = [
@@ -403,6 +405,32 @@ const addConsentUpdateDl = (consentType) => {
   });
 };
 
+// communicate the consent preferences to both Microsoft UET and Clarity (consent v2 API)
+const setMicrosoftConsentState = (consentSettings) => {
+  // UET events queue
+  const uetqPush = createQueue('uetq');
+  
+  // Clarity events queue
+  // https://github.com/microsoft/clarity/blob/master/packages/clarity-js/src/queue.ts
+  const setupClarity = () => {
+    setInWindow('clarity', function() {
+      const clarityPush = createQueue('clarity.q');
+      clarityPush(arguments);
+    });
+
+    return copyFromWindow('clarity');
+  };
+  
+  const clarity = copyFromWindow('clarity') || setupClarity();
+
+  clarity('consentv2', {
+    ad_Storage: consentSettings.ad_storage,
+    analytics_Storage: consentSettings.analytics_storage
+  });
+  
+  uetqPush('consent', data.configurationType, consentSettings);
+};
+
 if (data.configurationType === 'default' || data.configurationType === 'update') {
   const setConsentState = data.configurationType === 'default' ? setDefaultConsentState : updateConsentState;
   
@@ -410,7 +438,7 @@ if (data.configurationType === 'default' || data.configurationType === 'update')
   
   // Microsoft consent mode
   if (data.microsoftUET) {
-    uetq('consent', data.configurationType, consentSettings);
+    setMicrosoftConsentState(consentSettings);
   }
 
   // add a consent change listener for each consent type that were denied
@@ -814,7 +842,85 @@ ___WEB_PERMISSIONS___
                 "mapValue": [
                   {
                     "type": 1,
+                    "string": "clarity"
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": false
+                  }
+                ]
+              },
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "key"
+                  },
+                  {
+                    "type": 1,
+                    "string": "read"
+                  },
+                  {
+                    "type": 1,
+                    "string": "write"
+                  },
+                  {
+                    "type": 1,
+                    "string": "execute"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
                     "string": "uetq"
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": false
+                  }
+                ]
+              },
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "key"
+                  },
+                  {
+                    "type": 1,
+                    "string": "read"
+                  },
+                  {
+                    "type": 1,
+                    "string": "write"
+                  },
+                  {
+                    "type": 1,
+                    "string": "execute"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "clarity.q"
                   },
                   {
                     "type": 8,
